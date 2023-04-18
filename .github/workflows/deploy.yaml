@@ -1,0 +1,38 @@
+name: Deployment From Github To AWS
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: package code
+        run: zip -r deploy.zip * -x '*.git*' ''
+      - name: get timestamp
+        uses: gerred/actions/current-time@master
+        id: current-time
+      - name: replace string in timestamp
+        uses: frabert/replace-string-action@master
+        id: format-time
+        with:
+          pattern: '[:\.]+'
+          string: "${{ steps.current-time.outputs.time }}"
+          replace-with: "-"
+          flags: "g"
+      - name: deploy to beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ env.APP_NAME }}
+          environment_name: ${{ env.BEANSTALK_ENV_NAME }}
+          version_label: "${{ steps.format-time.outputs.replaced }}"
+          region: ${{ env.AWS_REGION }}
+          deployment_package: deploy.zip
