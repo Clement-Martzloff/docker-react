@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feat/*
+      - fix/*
 jobs:
   test:
     runs-on: ubuntu-latest
