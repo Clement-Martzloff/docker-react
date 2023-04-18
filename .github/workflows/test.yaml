@@ -1,18 +1,17 @@
-name: React App Tests
-
+name: test
 on:
   push:
     branches:
       - feat/*
-
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: checkout code
+        uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Install Dependencies
+          ref: ${{ github.sha }}
+      - name: install dependencies
         run: npm ci
-      - name: Run Tests
+      - name: run tests
         run: CI=true npm test
