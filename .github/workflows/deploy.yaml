@@ -24,6 +24,11 @@ jobs:
           string: "${{ steps.current-time.outputs.time }}"
           replace-with: "-"
           flags: "g"
+      - name: echo variables
+        run: |
+          echo ${{ env.APP_NAME }};
+          echo ${{ env.BEANSTALK_ENV_NAME }};
+          echo ${{ env.AWS_REGION }}
       - name: deploy to beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
